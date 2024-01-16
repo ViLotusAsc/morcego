@@ -45,6 +45,11 @@ def bot():
 
     client=commands.Bot(command_prefix=".", intents=discord.Intents.all())
 
+    @client.event
+    async def on_ready():
+        await client.change_presence(activity=discord. Activity(type=discord.ActivityType.watching, name='Filme'))
+
+
     class Buttons(discord.ui.View):
         def __init__(self, *, timeout=180):
             super().__init__(timeout=timeout)
@@ -52,13 +57,69 @@ def bot():
         async def blurple_button(self,interaction:discord.Interaction, button:discord.ui.Button):
             await interaction.response.edit_message(content=f"just edit this message..\nDESAFIO ACEITO!",view=self)
             print('Pressionado!')
-            fechar_game(True)
+
+    @client.command()
+    async def battle(ctx, user):
+        await ctx.send("Você quer batalhar?",view=Buttons())
+        user_profile = await client.fetch_user(user)
+        await ctx.send(",battle")
+
+    @client.command()
+    async def dm(ctx, person):
+        perfil = await client.fetch_user(person)
+        print(person)
+        print(type(person))
+        try:
+            await ctx.send(",battle 629071779138240523")
+        except Exception as e:
+            await ctx.send(e)
+
+    @client.command()
+    async def login(ctx, nome):
+        await ctx.send(f"Login feito!")
+        data["contas"][nome] = {
+            "token": "xxxxxx", 
+            "dinheiro": 0, 
+            "bot": {
+                "nome_bot": "Default", 
+                "forca": 10, 
+                "vida": 100, 
+                "ataques": {
+                    "ata1": "default1", 
+                    "ata2": "default2"
+                }
+            }
+        }
+        with open('client_database.json', 'w') as file:
+            file = json.dump(data, file, indent=4)
+        user = client.get_user("629071779138240523")
+        await user.send("uiui")
+
+        
+    token="NzY3NDQ1MzIyMTUwMzEzOTg1.GJvmb5.zis07q9SP9aAhn_mwF15ejsyLK3GuneWfx_nHI"
+    client.run(token)
+
+def bot2():
+    intents = discord.Intents.default()
+    intents.message_content = True
+
+    client=commands.Bot(command_prefix=",", intents=discord.Intents.all())
+
+    @client.event
+    async def on_message(message):
+        if message.content.startswith(",battle"):
+            mensagem = (message.content).split()
+            conta = mensagem[-1]
+            await message.channel.send("Ei")
+            conta1 = await client.fetch_user(conta)
+            await conta1.send("ayo")
 
     @client.command()
     async def battle(ctx):
-        await ctx.send("Você quer batalhar?",view=Buttons())
-        
-    token="NzY3NDQ1MzIyMTUwMzEzOTg1.GU2Dzh.NillPwxSIcai4qluqOuISNypTdFfRd3vpMxC8Y"
+        await ctx.send("ayo")
+
+
+    token="OTAzMDkzOTU2ODIzMzY3Njgw.GHwJ5S.n-CR2hDp7556hitoK22jpaOpuqFGCKFGBJZ7Nw"
     client.run(token)
 
 
@@ -344,7 +405,7 @@ def game():
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         boss_battle_running = False
 
-                screen.blit(boss_battle_back, (0, 0))
+                screen.blit(boss_battle_back, (300, 10))
                 pygame.display.update()
 
         pygame.display.update()
@@ -353,9 +414,12 @@ def game():
 if __name__ == "__main__":
     t1 = threading.Thread(target=game)
     t2 = threading.Thread(target=bot)
+    t3 = threading.Thread(target=bot2)
     t2.start()
     #sleep(20)
     t1.start()
+    t3.start()
 
     t2.join()
     t1.join()
+    t3.join()

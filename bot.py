@@ -46,8 +46,10 @@ def bot():
             print('Pressionado!')
 
     @client.command()
-    async def battle(ctx):
+    async def battle(ctx, user):
         await ctx.send("Você quer batalhar?",view=Buttons())
+        user_profile = await client.fetch_user(user)
+        await ctx.send(",battle")
 
     @client.command()
     async def dm(ctx, person):
@@ -81,7 +83,20 @@ def bot():
         await user.send("uiui")
 
         
-    token="NzY3NDQ1MzIyMTUwMzEzOTg1.GU2Dzh.NillPwxSIcai4qluqOuISNypTdFfRd3vpMxC8Y"
+    token="NzY3NDQ1MzIyMTUwMzEzOTg1.GJvmb5.zis07q9SP9aAhn_mwF15ejsyLK3GuneWfx_nHI"
     client.run(token)
 
+def bot2():
+    intents = discord.Intents.default()
+    intents.message_content = True
+
+    client=commands.Bot(command_prefix=",", intents=discord.Intents.all())
+
+    @client.command()
+    async def battle(ctx):
+        ctx.send("ayo")
+
+
+    token="OTAzMDkzOTU2ODIzMzY3Njgw.GHwJ5S.n-CR2hDp7556hitoK22jpaOpuqFGCKFGBJZ7Nw"
+    client.run(token)
 bot()
