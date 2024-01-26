@@ -45,6 +45,11 @@ def bot():
             await interaction.response.edit_message(content=f"just edit this message..\nDESAFIO ACEITO!",view=self)
             print('Pressionado!')
 
+    @client.event
+    async def on_message(message):
+        if message.content.startswith("ei"):
+            await message.channel.send("Ei")
+
     @client.command()
     async def battle(ctx, user):
         await ctx.send("Você quer batalhar?",view=Buttons())
@@ -83,7 +88,7 @@ def bot():
         await user.send("uiui")
 
         
-    token="NzY3NDQ1MzIyMTUwMzEzOTg1.GJvmb5.zis07q9SP9aAhn_mwF15ejsyLK3GuneWfx_nHI"
+    token="OTAzMDkzOTU2ODIzMzY3Njgw.GyJXAu.DcqK4xsv_7X8QamkdsgLLSgnzd7veJXi5toVhk"
     client.run(token)
 
 def bot2():

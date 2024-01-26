@@ -24,20 +24,228 @@ def trocar_variavel(texto):
     with lockar:
         variavel_global = texto
 
+addorno = False
+item_information = []
+def willAdd(vaiounao, name, position, number):
+    global addorno
+    global item_information
+    if name == "":
+        with lockar:
+            item_information = []
+    else:
+        with lockar:
+            addorno = vaiounao
+            item_information.append(name)
+            item_information.append(position)
+            item_information.append(number)
+
+
 print(data)
 
+def game():
+    pygame.init()
 
-send_save = False
-def sendsave(yorn):
-    global send_save
-    with lockar:
-        send_save = yorn
+    screen = pygame.display.set_mode((348, 520), pygame.RESIZABLE)
 
-fechar = False
-def fechar_game(soun):
-    global fechar
-    with lockar:
-        fechar = soun
+    background_foto = pygame.image.load("sprites/79AC/sem título.jpg")
+    background_foto = pygame.transform.scale(background_foto, (1180, 620))
+
+    gameplay_area = pygame.image.load("sprites/79AC/gameplay.jpg")
+    gameplay_area = pygame.transform.scale(gameplay_area, (348, 520))
+
+    mesa_foto = pygame.image.load("sprites/79AC/mesa.jpg")
+    mesa_foto = pygame.transform.scale(mesa_foto, (1180, 620))
+
+    running = True
+
+    inventory = []
+
+    lockar = threading.Lock()
+    with open('tsukaDatabase_local.json', 'r') as file:
+        data = json.load(file)
+
+    class Button:
+        def __init__(self, x, y, x_final, y_final):
+            self.x = x
+            self.y = y
+            self.x_final = x_final
+            self.y_final = y_final
+            self.ButtonCollision = pygame.Rect((self.x, self.y) ,((self.x_final-self.x), (self.y_final- self.y)))
+
+        def createButton(self):
+            self.ButtonCollision = pygame.Rect((self.x, self.y) ,((self.x_final-self.x), (self.y_final- self.y)))
+
+        def printButton(self, color=(0, 0, 0)):
+            pygame.draw.rect(screen, (color), self.ButtonCollision)
+
+        def isButtonPressed(self, point):
+            if pygame.Rect.collidepoint(self.ButtonCollision, point):
+                return True
+            else:
+                return False
+
+    buttonPlay = Button(521, 209, 859, 265)
+    buttonPlay.createButton()
+
+    buttonCredit = Button(521, 279, 859, 335)
+    buttonCredit.createButton()
+
+    local = "menu"
+
+    locais_esq = [(351, 427), (468, 427),  (298, 503), (421, 503)]
+    locais_dir = [(813, 421), (945, 421), (873, 496), (1023, 497)]
+
+    class Itens:
+        def __init__(self):
+            self.ladoesq = data["mesaIndivEsq"]
+            self.ladodir = data["mesaIndivDir"]
+
+            self.faca_sprite = pygame.image.load("sprites/79AC/knife_artt.png")
+            self.faca_sprite = pygame.transform.scale(self.faca_sprite, (45, 45))
+            self.faca_x = -100
+            self.faca_y = 0
+
+            self.refri_sprite = pygame.image.load("sprites/79AC/cokeartt.png")
+            self.refri_sprite = pygame.transform.scale(self.refri_sprite, (50, 50))
+            self.refri_x = -100
+            self.refri_y = 0
+
+            self.caixa_sprite = pygame.image.load("sprites/79AC/caixinhaart.png")
+            self.caixa_sprite = pygame.transform.scale(self.caixa_sprite, (50, 50))
+            self.caixa_x = -100
+            self.caixa_y = 0
+
+            self.lupa_sprite = pygame.image.load("sprites/79AC/lupaart.png")
+            self.lupa_sprite = pygame.transform.scale(self.lupa_sprite, (50, 50))
+            self.lupa_x = -100
+            self.lupa_y = 0
+
+            self.locais_esq = [(351, 427), (468, 427),  (298, 503), (421, 503)]
+            self.locais_esq = [(23, 309), (89, 311), (24, 426), (88, 427)]
+            self.locais_dir = [(813, 421), (945, 421), (873, 496), (1023, 497)]
+            self.locais_dir = [(215, 310), (282, 307), (215, 427), (282, 427)]
+
+            self.itens_list = ["faca", "lata", "lupa", "caixa"]
+
+            self.inventario = []
+
+            self.itemEscolhido = ""
+
+        def changeItens(self, lado, item, lugar):
+            if lado == "dir":
+                self.ladodir[f"lugar{lugar}"] = item
+            if lado == "esq":
+                self.ladoesq[f"lugar{lugar}"] = item
+
+        def saveInformations(self):
+            with open("tsukaDatabase_local.json", "w") as file:
+                file = json.dump(data, file, indent=4)
+
+        def drawSprites(self, obj, lado, num):
+            if len(inventory) < 9:
+                if lado == "esq":
+                    inventory.append(obj)
+                    if obj == "faca":
+                        self.itemEscolhido = "faca"
+                        self.faca_x = self.locais_esq[num-1][0]
+                        self.faca_y = self.locais_esq[num-1][1]
+                    if obj == "lata":
+                        self.itemEscolhido = "lata"
+                        self.refri_x = self.locais_esq[num-1][0]
+                        self.refri_y = self.locais_esq[num-1][1]
+                    if obj == "caixa":
+                        self.caixa_x = self.locais_esq[num-1][0]
+                        self.caixa_y = self.locais_esq[num-1][1]
+                    if obj == "lupa":
+                        self.lupa_x = self.locais_esq[num-1][0]
+                        self.lupa_y = self.locais_esq[num-1][1]
+                if lado == "dir":
+                    inventory.append(obj)
+                    if obj == "faca":
+                        self.itemEscolhido = "faca"
+                        self.faca_x = self.locais_dir[num-1][0]
+                        self.faca_y = self.locais_dir[num-1][1]
+                    if obj == "lata":
+                        self.itemEscolhido = "lata"
+                        self.refri_x = self.locais_dir[num-1][0]
+                        self.refri_y = self.locais_dir[num-1][1]
+                    if obj == "caixa":
+                        self.caixa_x = self.locais_dir[num-1][0]
+                        self.caixa_y = self.locais_dir[num-1][1]
+                    if obj == "lupa":
+                        self.lupa_x = self.locais_dir[num-1][0]
+                        self.lupa_y = self.locais_dir[num-1][1]
+                if lado == "exit":
+                    try:
+                        inventory.remove(obj)
+                    except:
+                        pass
+                    if obj == "faca":
+                        self.faca_x = -100
+                    if obj == "lata":
+                        self.refri_x = -100
+                    if obj == "caixa":
+                        self.caixa_x = -100
+                    if obj == "lupa":
+                        self.lupa_x = -100
+
+
+    itens = Itens()
+    item1 = Itens()
+    item2 = Itens()
+    item3 = Itens()
+    item4 = Itens()
+    item5 = Itens()
+    item6 = Itens()
+    item7 = Itens()
+
+    allitens = [itens, item1, item2, item3, item4, item5, item6, item7]
+    def blitAll():
+        for item in allitens:
+            screen.blit(item.faca_sprite, (item.faca_x, item.faca_y))
+            screen.blit(item.refri_sprite, (item.refri_x, item.refri_y))
+            screen.blit(item.caixa_sprite, (item.caixa_x, item.caixa_y))
+            screen.blit(item.lupa_sprite, (item.lupa_x, item.lupa_y))
+
+    while running:
+        if local == "menu":
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_1:
+                        print(background_foto.get_size())
+                    if event.type == pygame.K_a:
+                            pass
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    print(event.pos)
+                    darPlay = buttonPlay.isButtonPressed
+                    if darPlay:
+                        local = "jogo"
+            screen.blit(background_foto, (100, 20))
+            pygame.display.update()
+
+        if local == "jogo":
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_a:
+                        itens.drawSprites("lata", "exit", 3)
+                    if event.key == pygame.K_q:
+                        print(f"Inventário: {inventory}")
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    print(event.pos)
+                    print(f"--- X: {itens.faca_x}\n--- Y: {itens.faca_y}")
+                    print(gameplay_area.get_size())
+            
+
+            screen.blit(mesa_foto, (100, 20))
+            screen.blit(gameplay_area, (0, 0))
+            blitAll()
+            #screen.blit(gameplay_area, (0, 0))
+            pygame.display.update()
+
 
 def bot():
     intents = discord.Intents.default()
@@ -58,6 +266,20 @@ def bot():
             await interaction.response.edit_message(content=f"just edit this message..\nDESAFIO ACEITO!",view=self)
             print('Pressionado!')
 
+    @client.event
+    async def on_message(message):
+        if message.content.startswith("ei"):
+            await message.channel.send("Ei")
+        if message.content.startswith("++"):
+            mensagem = message.content.split()
+            name = mensagem[1]
+            posic = mensagem[2]
+            nnumber = mensagem[3]
+            loading_gun_message = discord.Embed(title="Começando o Jogo...", colour=0xFF5733, description="https://media1.tenor.com/m/fDakhj-iKdEAAAAC/aesthetic-anime.gif")
+            await message.channel.send(embed=loading_gun_message)
+
+            
+
     @client.command()
     async def battle(ctx, user):
         await ctx.send("Você quer batalhar?",view=Buttons())
@@ -70,7 +292,7 @@ def bot():
         print(person)
         print(type(person))
         try:
-            await ctx.send(",battle 629071779138240523")
+            await perfil.send(".dm 629071779138240523")
         except Exception as e:
             await ctx.send(e)
 
@@ -96,7 +318,7 @@ def bot():
         await user.send("uiui")
 
         
-    token="NzY3NDQ1MzIyMTUwMzEzOTg1.GJvmb5.zis07q9SP9aAhn_mwF15ejsyLK3GuneWfx_nHI"
+    token="OTAzMDkzOTU2ODIzMzY3Njgw.GyJXAu.DcqK4xsv_7X8QamkdsgLLSgnzd7veJXi5toVhk"
     client.run(token)
 
 def bot2():
@@ -123,294 +345,6 @@ def bot2():
     client.run(token)
 
 
-def game():
-    pygame.init()
-    screen = pygame.display.set_mode((600, 600), pygame.RESIZABLE)
-
-    running = True
-    score = 0
-    clock = pygame.time.Clock()
-
-    player_x = 500
-    player_y = 338
-
-    player_username = "lotusvi"
-
-    class Player():
-        def __init__(self, player_xx, player_yy):
-            self.player_x = player_xx
-            self.player_y = player_yy
-            self.ft_player = 0
-
-            self.pl_mud_x_d = False
-            self.pl_mud_x_e = False
-            self.pl_mud_y_c = False
-            self.pl_mud_y_b = False
-            self.player_spr = list()
-
-            self.virado = False
-            self.player_esquerda = False
-            self.player_direita = True
-            self.ataque = pygame.Rect((self.player_x-25, self.player_y+25), (50, 20))
-            self.tiro = pygame.Rect((0, 0), (20, 20))
-
-
-        def takeSprites(self):
-            for foto in range(1, 11):
-                for i in range(0, 7):
-                    self.player_spr.append(pygame.transform.scale(pygame.image.load(f"sprites/player_sprites/player_{foto}.png"), (50, 50)))
-
-
-        def isColliding(self, collisions_list):
-            self.pl_baixo = pygame.Rect((self.player_x+25, self.player_y+50), (2, 2))
-            self.pl_esq = pygame.Rect((self.player_x, self.player_y+25), (2, 2))
-            self.pl_dir = pygame.Rect((self.player_x+50, self.player_y+25), (2, 2))
-            self.pl_cima = pygame.Rect((self.player_x+25, self.player_y), (2, 2))
-
-            if self.pl_mud_x_e:
-                if self.pl_esq.collidelist(collisions_list) == -1:
-                    self.player_x -= 6
-                if self.ft_player < 9:
-                    self.ft_player += 1
-                else:
-                    self.ft_player = 0
-            if self.pl_mud_x_d:
-                if self.pl_dir.collidelist(collisions_list) == -1:
-                    self.player_x += 6
-                if self.ft_player < 9:
-                    self.ft_player += 1
-                else:
-                    self.ft_player = 0
-            if self.pl_mud_y_c:
-                if self.pl_cima.collidelist(collisions_list) == -1:
-                    self.player_y -= 6
-                if self.ft_player < 9:
-                    self.ft_player += 1
-                else:
-                    self.ft_player = 0
-            if self.pl_mud_y_b:
-                if self.pl_baixo.collidelist(collisions_list) == -1:
-                    self.player_y += 6
-                if self.ft_player < 9:
-                    self.ft_player += 1
-                else:
-                    self.ft_player = 0
-        
-        def blitPlayer(self):
-            if not self.virado:
-                screen.blit(self.player_spr[self.ft_player], (self.player_x, self.player_y))
-            else:
-                screen.blit(pygame.transform.flip(self.player_spr[self.ft_player], True, False), (self.player_x, self.player_y))
-
-        def attack(self):
-            if not self.virado:
-                self.ataque = pygame.Rect((self.player_x-25, self.player_y+25), (50, 20))
-            else:
-                self.ataque = pygame.Rect((self.player_x+25, self.player_y+25), (50, 20))
-        
-        def Tiro(self, init_x, init_y):
-            self.tiro = pygame.Rect((init_x+25, init_y+25), (20, 20))
-            mouse_pos = pygame.mouse.get_pos()
-            if init_x < mouse_pos[0]:
-                init_x += 1
-            else:
-                init_x -= 1
-            if init_y < mouse_pos[1]:
-                init_y += 1
-            else:
-                init_y -= 1
-
-
-    up_forca = False
-
-    atacando = False
-
-    boss_battle_running = True
-
-
-    class Enemy():
-        def __init__(self, x, y):
-            self.ft_enemy = 0
-            self.enemy_x = x
-            self.enemy_y = y
-            self.enemy_spr = list()
-            self.enemy_collision = pygame.Rect((self.enemy_x, self.enemy_y), (30, 30))
-            self.enemy_morto = False
-            for foto in range(1, 3):
-                for i in range(0, 4):
-                    self.enemy_spr.append(pygame.transform.scale(pygame.image.load(f"sprites/ghost{foto}_e.png"), (30, 30)))
-
-        def changeSprites(self):
-            if self.ft_enemy <7:
-                self.ft_enemy += 1
-            else:
-                self.ft_enemy = 0
-
-        def followPlayer(self, x, y):
-            if x > self.enemy_x:
-                self.enemy_x += 1
-                self.enemy_collision = pygame.Rect((self.enemy_x, self.enemy_y), (30, 30))
-            else: 
-                self.enemy_x -= 1
-                self.enemy_collision = pygame.Rect((self.enemy_x, self.enemy_y), (30, 30))
-
-            if y > self.enemy_y:
-                self.enemy_y += 1
-                self.enemy_collision = pygame.Rect((self.enemy_x, self.enemy_y), (30, 30))
-            else:
-                self.enemy_y -= 1
-                self.enemy_collision = pygame.Rect((self.enemy_x, self.enemy_y), (30, 30))
-
-        def isDead(self, att):
-            att = player.ataque
-            if att.colliderect(self.enemy_collision):
-                self.enemy_morto = True
-                print("colisao")
-        def blitEnemy(self):
-            screen.blit(self.enemy_spr[self.ft_enemy], (self.enemy_x, self.enemy_y))
-
-
-    def montar_inimigo(var):
-        var.changeSprites()
-        var.followPlayer(player.player_x, player.player_y)
-        if atacando:
-            if player.ataque.colliderect(var.enemy_collision):
-                var.enemy_morto = True
-                up_forca = True
-        if not var.enemy_morto:
-            var.blitEnemy()
-
-    def Respawn(var, x, y):
-        var.enemy_morto = False
-        var.enemy_x = x
-        var.enemy_y = y
-
-
-
-
-    if True:
-        back1 = pygame.image.load("sprites/scenario/scnd_overworld.jpg")
-        back1 = pygame.transform.scale(back1, (740, 676))
-
-        boss_battle_back = pygame.image.load("sprites/scenario/boss_battle.jpg")
-        boss_battle_back = pygame.transform.scale(boss_battle_back, (740, 676))
-
-    def draw_screen(cor, obj, sla=False):
-        if not sla:
-            pygame.draw.rect(screen, cor, obj)
-        else:
-            pygame.draw.rect(screen, cor, obj, 1)
-
-    if True:
-        grama1 = pygame.Rect((368, 195), (136, 30))
-        grama1_1 = pygame.Rect((586, 195), (138, 30))
-        grama2 = pygame.Rect((368, 12), (354, 30))
-        grama3 = pygame.Rect((367, 12), (30, 213))
-        grama4 = pygame.Rect((694, 12), (30, 213))
-        grama5 = pygame.Rect((692, 379), (30, 175))
-        block1 = pygame.Rect((299, 10), (10, 999))
-        bl2 = pygame.Rect((1040, 11), (10, 999))
-        barreira_1 = pygame.Rect((289, 10), (69, 301))
-        grama6 = pygame.Rect((725, 377), (315, 30))
-        barraquinha_collision = pygame.Rect((735, 11), (83, 82))
-        casinha_collision  = pygame.Rect((879, 36), (128, 129))
-        caixinha_collision = pygame.Rect((856, 171), (25, 33))
-        caixinha_collision2 = pygame.Rect((971, 283), (25, 33))
-        caixinha_collision3 = pygame.Rect((769, 327), (25, 33))
-        caixinha_collision4 = pygame.Rect((372, 260), (25, 33))
-
-        collision = [grama1, grama2, grama3, grama4, grama5, grama1_1, block1, barreira_1, grama6, bl2, barraquinha_collision, casinha_collision, caixinha_collision, caixinha_collision2, caixinha_collision3, caixinha_collision4]
-
-    draw_attack = False
-
-    player = Player(player_x, player_y)
-    player.takeSprites()
-
-
-    enemy1 = Enemy(450, 70)
-    enemy2 = Enemy(906, 558)
-
-    boss_battle = pygame.Rect((474, 523), (50, 50))
-    enter_bossBattle = False
-
-    while running:
-        player.attack()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                print(event.pos)
-                data[player_username]["bot"]["forca"] += 10
-                draw_attack = True
-                atacando = True
-            if event.type == pygame.MOUSEBUTTONUP:
-                draw_attack = False
-                atacando = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_p:
-                    data[player_username]["bot"]["forca"] += 10
-                if event.key == pygame.K_q:
-                    with open('local_database.json', 'w') as file:
-                        file = json.dump(data, file, indent=4)
-                if event.key == pygame.K_w:
-                    player.pl_mud_y_c = True
-                if event.key == pygame.K_s:
-                    player.pl_mud_y_b = True
-                if event.key == pygame.K_a:
-                    player.pl_mud_x_e = True
-                    player.virado = False
-                if event.key == pygame.K_d:
-                    player.pl_mud_x_d = True
-                    player.virado = True
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_w:
-                    player.pl_mud_y_c = False
-                if event.key == pygame.K_s:
-                    player.pl_mud_y_b = False
-                if event.key == pygame.K_a:
-                    player.pl_mud_x_e = False
-                if event.key == pygame.K_d:
-                    player.pl_mud_x_d = False
-        
-        player.isColliding(collision)
-
-        screen.fill((0, 0, 0))
-        screen.blit(back1, (300, 10))
-        player.blitPlayer()
-
-        montar_inimigo(enemy1)
-        montar_inimigo(enemy2)
-
-
-        if casinha_collision.collidelist([player.pl_baixo, player.pl_cima, player.pl_dir, player.pl_esq]) != -1:
-            Respawn(enemy1, 450, 70)
-            Respawn(enemy2, 906, 558)
-
-        if draw_attack:                                                         # shows attack colision when pressed 
-            draw_screen((255, 255, 255), player.ataque)
-        draw_screen((255, 0, 0), boss_battle)
-        
-        if up_forca:
-            data[player_username]["bot"]["forca"] += 10
-            up_forca = False
-
-        if boss_battle.collidelist([player.pl_baixo, player.pl_cima, player.pl_dir, player.pl_esq]) != -1:
-            enter_bossBattle = True
-
-        if enter_bossBattle:
-            while boss_battle_running:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        boss_battle_running = False
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        boss_battle_running = False
-
-                screen.blit(boss_battle_back, (300, 10))
-                pygame.display.update()
-
-        pygame.display.update()
-        clock.tick(60)
-
 if __name__ == "__main__":
     t1 = threading.Thread(target=game)
     t2 = threading.Thread(target=bot)
@@ -422,4 +356,4 @@ if __name__ == "__main__":
 
     t2.join()
     t1.join()
-    t3.join()
+    #t3.join()
