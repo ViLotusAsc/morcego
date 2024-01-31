@@ -10,8 +10,6 @@ variavel_global = ""
 
 lockar = threading.Lock()
 
-with open('client_database.json', 'r') as file:
-    data = json.load(file)
 
 def trocar_variavel(texto):
     global variavel_global
@@ -49,6 +47,10 @@ def bot():
     async def on_message(message):
         if message.content.startswith("ei"):
             await message.channel.send("Ei")
+        if message.content.startswith("++"):
+            mensagem = message.content
+            mensagem.split()
+            
 
     @client.command()
     async def battle(ctx, user):
@@ -65,28 +67,6 @@ def bot():
             await perfil.send(".dm 629071779138240523")
         except Exception as e:
             await ctx.send(e)
-
-    @client.command()
-    async def login(ctx, nome):
-        await ctx.send(f"Login feito!")
-        data["contas"][nome] = {
-            "token": "xxxxxx", 
-            "dinheiro": 0, 
-            "bot": {
-                "nome_bot": "Default", 
-                "forca": 10, 
-                "vida": 100, 
-                "ataques": {
-                    "ata1": "default1", 
-                    "ata2": "default2"
-                }
-            }
-        }
-        with open('client_database.json', 'w') as file:
-            file = json.dump(data, file, indent=4)
-        user = client.get_user("629071779138240523")
-        await user.send("uiui")
-
         
     token="OTAzMDkzOTU2ODIzMzY3Njgw.GyJXAu.DcqK4xsv_7X8QamkdsgLLSgnzd7veJXi5toVhk"
     client.run(token)

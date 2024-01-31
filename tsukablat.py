@@ -1,11 +1,21 @@
 import pygame
 from random import randint
+from random import choice
 import json
 import threading
+import ctypes
+from ctypes import wintypes 
 
 pygame.init()
 
 screen = pygame.display.set_mode((348, 520), pygame.RESIZABLE)
+
+hwnd = pygame.display.get_wm_info()['window']
+    
+user32 = ctypes.WinDLL("user32")
+user32.SetWindowPos.restype = wintypes.HWND
+user32.SetWindowPos.argtypes = [wintypes.HWND, wintypes.HWND, wintypes.INT, wintypes.INT, wintypes.INT, wintypes.INT, wintypes.UINT]
+user32.SetWindowPos(hwnd, -1, 600, 300, 0, 0, 0x0001)
 
 background_foto = pygame.image.load("sprites/79AC/sem título.jpg")
 background_foto = pygame.transform.scale(background_foto, (1180, 620))
@@ -13,12 +23,18 @@ background_foto = pygame.transform.scale(background_foto, (1180, 620))
 gameplay_area = pygame.image.load("sprites/79AC/gameplay.jpg")
 gameplay_area = pygame.transform.scale(gameplay_area, (348, 520))
 
-mesa_foto = pygame.image.load("sprites/79AC/mesa.jpg")
-mesa_foto = pygame.transform.scale(mesa_foto, (1180, 620))
+#mesa_foto = pygame.image.load("sprites/79AC/mesa.jpg")
+#mesa_foto = pygame.transform.scale(mesa_foto, (1180, 620))
 
 running = True
 
-inventory = []
+inventory = ["none", "none", "none", "lata", "none", "none", "none", "none"]
+inventory_dir = ["none", "none", "none", "none"]
+inventory_esq =  ["none",  "none", "none", "none"]
+inventory_places_dir = [(23, 309), (89, 311), (24, 426), (88, 427)]
+inventory_places_esq = [(215, 310), (282, 307), (215, 427), (282, 427)]
+
+itens_listt = ["faca", "lata", "lupa", "caixa"]
 
 lockar = threading.Lock()
 with open('tsukaDatabase_local.json', 'r') as file:
@@ -44,6 +60,8 @@ class Button:
         else:
             return False
 
+counter_embaralho = 0
+
 buttonPlay = Button(521, 209, 859, 265)
 buttonPlay.createButton()
 
@@ -57,9 +75,9 @@ locais_dir = [(813, 421), (945, 421), (873, 496), (1023, 497)]
 
 class Itens:
     def __init__(self):
-        self.ladoesq = data["mesaIndivEsq"]
-        self.ladodir = data["mesaIndivDir"]
-
+        #self.ladoesq = data["mesaIndivEsq"]
+        #self.ladodir = data["mesaIndivDir"]
+#
         self.faca_sprite = pygame.image.load("sprites/79AC/knife_artt.png")
         self.faca_sprite = pygame.transform.scale(self.faca_sprite, (45, 45))
         self.faca_x = -100
@@ -101,50 +119,42 @@ class Itens:
         with open("tsukaDatabase_local.json", "w") as file:
             file = json.dump(data, file, indent=4)
 
-    def drawSprites(self, obj, lado, num):
-        if len(inventory) < 9:
-            if lado == "esq":
-                inventory.append(obj)
-                if obj == "faca":
-                    self.itemEscolhido = "faca"
-                    self.faca_x = self.locais_esq[num-1][0]
-                    self.faca_y = self.locais_esq[num-1][1]
-                if obj == "lata":
-                    self.itemEscolhido = "lata"
-                    self.refri_x = self.locais_esq[num-1][0]
-                    self.refri_y = self.locais_esq[num-1][1]
-                if obj == "caixa":
-                    self.caixa_x = self.locais_esq[num-1][0]
-                    self.caixa_y = self.locais_esq[num-1][1]
-                if obj == "lupa":
-                    self.lupa_x = self.locais_esq[num-1][0]
-                    self.lupa_y = self.locais_esq[num-1][1]
-            if lado == "dir":
-                inventory.append(obj)
-                if obj == "faca":
-                    self.itemEscolhido = "faca"
-                    self.faca_x = self.locais_dir[num-1][0]
-                    self.faca_y = self.locais_dir[num-1][1]
-                if obj == "lata":
-                    self.itemEscolhido = "lata"
-                    self.refri_x = self.locais_dir[num-1][0]
-                    self.refri_y = self.locais_dir[num-1][1]
-                if obj == "caixa":
-                    self.caixa_x = self.locais_dir[num-1][0]
-                    self.caixa_y = self.locais_dir[num-1][1]
-                if obj == "lupa":
-                    self.lupa_x = self.locais_dir[num-1][0]
-                    self.lupa_y = self.locais_dir[num-1][1]
-            if lado == "exit":
-                inventory.remove(obj)
-                if obj == "faca":
-                    self.faca_x = -100
-                if obj == "lata":
-                    self.refri_x = -100
-                if obj == "caixa":
-                    self.caixa_x = -100
-                if obj == "lupa":
-                    self.lupa_x = -100
+    def drawSprites(self, obj, lado, num, f=counter_embaralho):
+        if lado == "esq":
+            if obj == "faca":
+                self.itemEscolhido = "faca"
+                self.faca_x = self.locais_esq[num-1][0]
+                self.faca_y = self.locais_esq[num-1][1]
+            if obj == "lata":
+                self.itemEscolhido = "lata"
+                self.refri_x = self.locais_esq[num-1][0]
+                self.refri_y = self.locais_esq[num-1][1]
+            if obj == "caixa":
+                self.caixa_x = self.locais_esq[num-1][0]
+                self.caixa_y = self.locais_esq[num-1][1]
+            if obj == "lupa":
+                self.lupa_x = self.locais_esq[num-1][0]
+                self.lupa_y = self.locais_esq[num-1][1]
+        if lado == "dir":
+            if obj == "faca":
+                self.itemEscolhido = "faca"
+                self.faca_x = self.locais_dir[num-1][0]
+                self.faca_y = self.locais_dir[num-1][1]
+            if obj == "lata":
+                self.itemEscolhido = "lata"
+                self.refri_x = self.locais_dir[num-1][0]
+                self.refri_y = self.locais_dir[num-1][1]
+            if obj == "caixa":
+                self.caixa_x = self.locais_dir[num-1][0]
+                self.caixa_y = self.locais_dir[num-1][1]
+            if obj == "lupa":
+                self.lupa_x = self.locais_dir[num-1][0]
+                self.lupa_y = self.locais_dir[num-1][1]
+        if lado == "exit":
+            self.faca_x = -100
+            self.refri_x = -100
+            self.caixa_x = -100
+            self.lupa_x = -100
 
 
 itens = Itens()
@@ -157,12 +167,24 @@ item6 = Itens()
 item7 = Itens()
 
 allitens = [itens, item1, item2, item3, item4, item5, item6, item7]
+itens_esq = [item4, item5, item6, item7]
+itens_dir = [itens, item1, item2, item3]
 def blitAll():
     for item in allitens:
         screen.blit(item.faca_sprite, (item.faca_x, item.faca_y))
         screen.blit(item.refri_sprite, (item.refri_x, item.refri_y))
         screen.blit(item.caixa_sprite, (item.caixa_x, item.caixa_y))
         screen.blit(item.lupa_sprite, (item.lupa_x, item.lupa_y))
+
+
+def chooseItens_Right():
+    for i in range(0, 4):
+        inventory[i] = choice(itens_listt)
+
+def chooseItens_Left():
+    for i in range(4, 8):
+        inventory[i] = choice(itens_listt)
+
 
 while running:
     if local == "menu":
@@ -173,11 +195,10 @@ while running:
                 if event.key == pygame.K_1:
                     print(background_foto.get_size())
                 if event.type == pygame.K_a:
-                        itens.drawSprites("lata", "exit", 3)
-                        print("top")
+                        pass
             if event.type == pygame.MOUSEBUTTONDOWN:
                 print(event.pos)
-                darPlay = buttonPlay.isButtonPressed
+                darPlay = buttonPlay.isButtonPressed(event.pos)
                 if darPlay:
                     local = "jogo"
         screen.blit(background_foto, (100, 20))
@@ -190,20 +211,30 @@ while running:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_a:
                     itens.drawSprites("lata", "exit", 3)
+                    item2.drawSprites("faca", "dir", 1)
                 if event.key == pygame.K_q:
                     print(f"Inventário: {inventory}")
             if event.type == pygame.MOUSEBUTTONDOWN:
-                print(event.pos)
-                print(f"--- X: {itens.faca_x}\n--- Y: {itens.faca_y}")
-                print(gameplay_area.get_size())
-                itens.drawSprites("lata", "esq", 3)
-                item2.drawSprites("lata", "dir", 1)
-                item1.drawSprites("faca", "dir", 3)
-                item6.drawSprites("lata", "esq", 1)
-                item3.drawSprites("lupa", "dir", 2)
+                chooseItens_Right()
+                chooseItens_Left()
+                item3.drawSprites("faca", "exit", 2)
+                itens.drawSprites(inventory[0], "exit", 1)
+                item1.drawSprites(inventory[1], "exit", 2)
+                item2.drawSprites(inventory[2], "exit", 3)
+                item4.drawSprites(inventory[4], "exit", 1)
+                item5.drawSprites(inventory[5], "exit", 2)
+                item6.drawSprites(inventory[6], "exit", 3)
+                item7.drawSprites(inventory[7], "exit", 4)
+                print(inventory)
 
-        screen.blit(mesa_foto, (100, 20))
         screen.blit(gameplay_area, (0, 0))
+        itens.drawSprites(inventory[0], "esq", 1)
+        item1.drawSprites(inventory[1], "esq", 2)
+        item2.drawSprites(inventory[2], "esq", 3)
+        item3.drawSprites(inventory[3], "esq", 4)
+        item4.drawSprites(inventory[4], "dir", 1)
+        item5.drawSprites(inventory[5], "dir", 2)
+        item6.drawSprites(inventory[6], "dir", 3)
+        item7.drawSprites(inventory[7], "dir", 4)
         blitAll()
-        #screen.blit(gameplay_area, (0, 0))
         pygame.display.update()

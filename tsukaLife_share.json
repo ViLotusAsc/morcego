@@ -1,0 +1,15 @@
+{
+    "player1": {
+        "vida": "999999",
+        "money": 9900,
+        "command_set": "_"
+    },
+    "player2": {
+        "vida": 3,
+        "money": 100,
+        "command_set": ""
+    },
+    "channel_set": 972520432618070036,
+    "tutorial_page": 9,
+    "balarealoufake": []
+}
