@@ -50,9 +50,10 @@ A utilização de um item modifica o arquivo JSON e envia a nova versão para o 
 ## Channel Set
 
 Antes de jogar também, é fundamental que o próximo comando a ser feito por cada jogador seja o: 
-- set_channel `id do canal`
+- `set_channel id do canal`
+
 Isso porquê será neste canal onde será feita a troca de informações entre os bots. Portanto, cada usuário deve primeiramente mandar o seguinte comando no canal privado de cada bot:
-- set_channel {id do canal}   # sem os colchetes
+
 Este ID é obtido clicando com o botão direito no canal desejado
 É importante que ambos escolham o mesmo canal, e que este não seja utilizado por eles nesta partida
 
