@@ -50,7 +50,7 @@ A utilização de um item modifica o arquivo JSON e envia a nova versão para o 
 ## Channel Set
 
 Antes de jogar também, é fundamental que o próximo comando a ser feito por cada jogador seja o: 
-- `set_channel id do canal`
+- `set_channel {id do canal}`      # sem os colchetes
 
 Isso porquê será neste canal onde será feita a troca de informações entre os bots. Portanto, cada usuário deve primeiramente mandar o seguinte comando no canal privado de cada bot:
 
@@ -61,7 +61,7 @@ Este ID é obtido clicando com o botão direito no canal desejado
 
 Primeiramente, cada jogador deve definir qual será sua variável que permitirá que utilize os comandos do bot. Para fazer isso ele deverá enviar o seguinte comando na caixa de mensagens privadas do bot 
 
-- comname X
+- `comname X`
 Onde X é a letra que ele escolhe para colocar antes de cada comando. Este valor é armazenado no arquivo JSON e referido no código como
 ```data_life["player1]["command_set]```
 É interessantre que um dos players instancie a string "d" como sua variável por questões de jogabilidade dentro do código, no qual atribui um nome específico para esta variável.
