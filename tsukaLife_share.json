@@ -1,15 +1,36 @@
 {
     "player1": {
-        "vida": "999999",
-        "money": 9900,
-        "command_set": "_"
+        "vida": 3,
+        "money": "",
+        "command_set": "d",
+        "tutorial_page": 0,
+        "shuffle": false,
+        "doubler": false,
+        "inventory": [
+            "none",
+            "none",
+            "none",
+            "none"
+        ]
     },
     "player2": {
-        "vida": 3,
-        "money": 100,
-        "command_set": ""
+        "vida": 1,
+        "money": "",
+        "command_set": "q",
+        "tutorial_page": 0,
+        "shuffle": true,
+        "doubler": false,
+        "inventory": [
+            "lata",
+            "faca",
+            "faca",
+            "lata"
+        ]
     },
     "channel_set": 972520432618070036,
-    "tutorial_page": 9,
-    "balarealoufake": []
+    "ammo": [
+        true,
+        false,
+        false
+    ]
 }
