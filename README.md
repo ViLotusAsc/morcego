@@ -47,7 +47,7 @@ Os itens são utilizados através do comando "dUse item" no Discord, seguido do 
 A utilização de um item modifica o arquivo JSON e envia a nova versão para o Discord, sincronizando a informação com o outro jogador.
 ## Instruções para uso
 
-## Channel Set
+### Channel Set
 
 Antes de jogar também, é fundamental que o próximo comando a ser feito por cada jogador seja o: 
 - `set_channel {id do canal}`      # sem os colchetes
@@ -57,7 +57,7 @@ Isso porquê será neste canal onde será feita a troca de informações entre o
 Este ID é obtido clicando com o botão direito no canal desejado
 É importante que ambos escolham o mesmo canal, e que este não seja utilizado por eles nesta partida
 
-## Variáveis de Comando 
+### Variáveis de Comando 
 
 Primeiramente, cada jogador deve definir qual será sua variável que permitirá que utilize os comandos do bot. Para fazer isso ele deverá enviar o seguinte comando na caixa de mensagens privadas do bot 
 
