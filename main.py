@@ -429,7 +429,7 @@ def bot():
             troca_life_pretty = json.dumps(datalife_troc, indent=4)
             await default_channel.send(f"{data_clone["player2"]["command_set"]}datachange ```{troca_life_pretty}```")
 
-        if message.content.startswith(f"{data_life["player1"]["command_set"]}set"):         # set the channel 
+        if message.content.startswith(f"set_channel"):         # set the channel 
             default_channel = int((message.content.split())[-1])
             await message.channel.send(default_channel)
             data_life["channel_set"] = default_channel
