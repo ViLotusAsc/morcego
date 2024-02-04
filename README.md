@@ -68,4 +68,4 @@ Onde X é a letra que ele escolhe para colocar antes de cada comando. Este valor
 
  
 
-## Dependências (adicionar aqui)
+## Dependências
